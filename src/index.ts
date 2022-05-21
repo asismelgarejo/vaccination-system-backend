@@ -59,7 +59,6 @@ const main = async () => {
 
   app.use(router);
   router.post("/login", async (req: any, res, next) => {
-    console.log("req body:", req.body);
     try {
       const userResult = await login({
         email: req.body.email,
@@ -79,8 +78,6 @@ const main = async () => {
   });
 
   router.post("/registervaccine", async (req: any, res, next) => {
-    console.log("req body:", req.body);
-    console.log("req session userid:", req.session!.userId);
     try {
       const msg = await registerVaccine({
         userId: req.session!.userId,
@@ -97,7 +94,6 @@ const main = async () => {
     }
   });
   router.get("/vaccinesbycitizen", async (req: any, res, next) => {
-    console.log("req body:", req.body);
     try {
       const vaccines = await getVaccinesByCitizenId({
         citizenId: req.body.citizenId,
@@ -116,7 +112,6 @@ const main = async () => {
     }
   });
   router.get("/citizenbydni", async (req, res, next) => {
-    console.log("req body:", req.body);
     try {
       const citizen = await getCitizenByDni({
         dni: req.body.dni,

@@ -42,7 +42,9 @@ export const registerVaccine = async ({
   if (!citizen) {
     return { messages: ["Citizen not found."] };
   }
-  const riskFactors = await RiskFactor.find({ where: { id: In(rFactorIds) }})
+  const riskFactors = await RiskFactor.find({
+    where: { code: In(rFactorIds) },
+  });
   const vaccine = await Vaccine.create({
     ref_cel_number,
     fc_dosis,
@@ -50,7 +52,7 @@ export const registerVaccine = async ({
     vc,
     dose,
     citizen,
-    riskFactors
+    riskFactors,
   }).save();
   if (!vaccine) {
     return { messages: ["Failed to register vaccine."] };

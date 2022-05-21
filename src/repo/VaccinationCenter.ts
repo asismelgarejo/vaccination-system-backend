@@ -12,6 +12,13 @@ export class VaccinationCenter extends Auditable {
     nullable: false,
   })
   name: string;
+  @Column("varchar", {
+    name: "code",
+    length: 150,
+    nullable: false,
+    unique: true,
+  })
+  code: string;
   @OneToMany(() => Vaccine, (vaccine) => vaccine.citizen)
   vaccines: Vaccine[];
 }

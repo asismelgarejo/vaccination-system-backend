@@ -1,6 +1,6 @@
 INSERT INTO
-  public."VaccinationCenters"("name")
+  public."VaccinationCenters"("name", "code")
 VALUES
-  ('Hospital regional'),
-  ('Posta de Huara'),
-  ('Posta de Manzanares');
+  ('Hospital regional', 'vc_hospital_regional'),
+  ('Posta de Huara', 'vc_posta_huara'),
+  ('Posta de Manzanares', 'vc_posta_manzanares');

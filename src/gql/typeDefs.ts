@@ -58,6 +58,7 @@ const typeDefs = gql`
     id: ID!
     name: String!
     vaccines: [Vaccine!]!
+    code: String!
     createdBy: String!
     createdOn: Date!
     lastModifiedBy: String!
@@ -66,10 +67,12 @@ const typeDefs = gql`
   type RiskFactor {
     id: ID!
     name: String!
+    code: String!
   }
   type VaccinationCenter {
     id: ID!
     name: String!
+    code: String!
     vaccines: [Vaccine!]!
   }
 
@@ -84,7 +87,7 @@ const typeDefs = gql`
     citizenId: ID!
     ref_cel_number: String!
     fc_dosis: Date
-    rFactorIds: [ID!]
+    rFactorIds: [String!]
   }
   input LoginInput {
     email: String!
@@ -92,9 +95,12 @@ const typeDefs = gql`
   }
   type Query {
     getAllVaccines: [Vaccine!]
+    getAllRFs: [RiskFactor!]
+    getAllVCs: [VaccinationCenter!]
+    getAllDoses: [Dose!]
     me: UserResult!
   }
-  
+
   type Mutation {
     getCitizenByDni(input: getCitizenByDniInput): CitizenResult
     registerVaccine(input: RegisterVaccineInput): EntityResult

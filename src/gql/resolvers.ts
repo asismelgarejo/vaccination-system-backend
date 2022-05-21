@@ -1,9 +1,15 @@
 import { IResolvers } from "apollo-server-express";
 import { Citizen } from "../repo/Citizen";
 import { getCitizenByDni } from "../repo/CitizenRepo";
+import { Dose } from "../repo/Dose";
+import { getAllDoses } from "../repo/DoseRepo";
 import { QueryArrayResult, QueryOneResult } from "../repo/QueryArrayResult";
+import { RiskFactor } from "../repo/RiskFactor";
+import { getAllRFs } from "../repo/RiskFactorRepo";
 import { User } from "../repo/User";
 import { login, logout, me, UserResult } from "../repo/UserRepo";
+import { VaccinationCenter } from "../repo/VaccinationCenter";
+import { getAllVCs } from "../repo/VaccinationCenterRepo";
 import { Vaccine } from "../repo/Vaccine";
 import { getAllVaccines, registerVaccine } from "../repo/VaccineRepo";
 import { GqlContext } from "./GqlContext";
@@ -89,6 +95,42 @@ const resolvers: IResolvers = {
         };
       } catch (e) {
         throw e;
+      }
+    },
+    getAllRFs: async (
+      parent: any,
+      args: null,
+      ctx: GqlContext
+    ): Promise<RiskFactor[]> => {
+      try {
+        const { rfs } = await getAllRFs();
+        return rfs;
+      } catch (error) {
+        throw error;
+      }
+    },
+    getAllVCs: async (
+      parent: any,
+      args: null,
+      ctx: GqlContext
+    ): Promise<VaccinationCenter[]> => {
+      try {
+        const { vcs } = await getAllVCs();
+        return vcs;
+      } catch (error) {
+        throw error;
+      }
+    },
+    getAllDoses: async (
+      parent: any,
+      args: null,
+      ctx: GqlContext
+    ): Promise<Dose[]> => {
+      try {
+        const { doses } = await getAllDoses();
+        return doses;
+      } catch (error) {
+        throw error;
       }
     },
   },

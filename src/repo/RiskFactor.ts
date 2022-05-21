@@ -11,4 +11,11 @@ export class RiskFactor extends Auditable {
     nullable: false,
   })
   name: string;
+  @Column("varchar", {
+    name: "code",
+    length: 150,
+    nullable: false,
+    unique: true,
+  })
+  code: string;
 }
