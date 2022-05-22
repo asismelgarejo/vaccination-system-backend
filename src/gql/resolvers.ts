@@ -11,7 +11,12 @@ import { login, logout, me, UserResult } from "../repo/UserRepo";
 import { VaccinationCenter } from "../repo/VaccinationCenter";
 import { getAllVCs } from "../repo/VaccinationCenterRepo";
 import { Vaccine } from "../repo/Vaccine";
-import { getAllVaccines, registerVaccine } from "../repo/VaccineRepo";
+import {
+  getAllVaccines,
+  getVcdCtzsStats,
+  IDataStats,
+  registerVaccine,
+} from "../repo/VaccineRepo";
 import { GqlContext } from "./GqlContext";
 
 interface EntityResult {
@@ -22,7 +27,6 @@ interface ILogResult {
   status: "success" | "failure";
   message: string;
 }
-
 interface IgetCitizenByDniInput {
   birthday: Date;
   dni: string;
@@ -129,6 +133,18 @@ const resolvers: IResolvers = {
       try {
         const { doses } = await getAllDoses();
         return doses;
+      } catch (error) {
+        throw error;
+      }
+    },
+    getVcdCtzsStats: async (
+      parent: any,
+      args: null,
+      ctx: GqlContext
+    ): Promise<IDataStats> => {
+      try {
+        const result = await getVcdCtzsStats();
+        return result.stats;
       } catch (error) {
         throw error;
       }

@@ -93,11 +93,27 @@ const typeDefs = gql`
     email: String!
     password: String!
   }
+
+  type WomenStats {
+    minors: Int!
+    adults: Int!
+  }
+  type MenStats {
+    minors: Int!
+    adults: Int!
+  }
+
+  type VcdCtzStats {
+    women: WomenStats!
+    men: MenStats!
+  }
+
   type Query {
     getAllVaccines: [Vaccine!]
     getAllRFs: [RiskFactor!]
     getAllVCs: [VaccinationCenter!]
     getAllDoses: [Dose!]
+    getVcdCtzsStats: VcdCtzStats!
     me: UserResult!
   }
 

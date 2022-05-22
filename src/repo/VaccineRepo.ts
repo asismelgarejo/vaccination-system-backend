@@ -24,7 +24,7 @@ export const registerVaccine = async ({
   citizenId,
   ref_cel_number,
   fc_dosis,
-  rFactorIds
+  rFactorIds,
 }: IVaccinne): Promise<QueryArrayResult<Vaccine>> => {
   const user = await User.findOne({ where: { id: userId } });
   if (!user) {
@@ -82,10 +82,192 @@ export const getAllVaccines = async (): Promise<QueryArrayResult<Vaccine>> => {
     .leftJoinAndSelect("vaccine.riskFactors", "riskFactors")
     .leftJoinAndSelect("vaccine.dose", "dose")
     .leftJoinAndSelect("vaccine.vc", "vc")
-    .orderBy({ "citizen.fr_lastname": "ASC" })
+    .orderBy({ "citizen.dni": "ASC" })
     .getMany();
   if (!vaccines) {
     return { messages: ["An error occurred retrieving vaccines"] };
   }
   return { entities: vaccines };
 };
+
+export interface IDataStats {
+  women: {
+    minors: number;
+    adults: number;
+  };
+  men: {
+    minors: number;
+    adults: number;
+  };
+}
+
+export interface IStatsResult {
+  stats: IDataStats;
+  messages?: string;
+}
+
+export const getVcdCtzsStats = async (): Promise<IStatsResult> => {
+  const eighteenAgo = () => {
+    const currentDay = new Date();
+    currentDay.setFullYear(currentDay.getFullYear() - 18);
+    return currentDay;
+  };
+  function getUniqueListBy(arr: Vaccine[], key: any) {
+    const citizens = arr.map((vac) => vac.citizen);
+    return [
+      ...new Map(citizens.map((item: any) => [item[key], item])).values(),
+    ];
+  }
+  let men_adult = await Vaccine.createQueryBuilder("vaccine")
+    .leftJoinAndSelect("vaccine.citizen", "citizen")
+    .where("citizen.gender =:gender AND citizen.birthday <= :eighteenAgo", {
+      gender: "M",
+      eighteenAgo: eighteenAgo(),
+    })
+    .getMany();
+
+  let men_minor = await Vaccine.createQueryBuilder("vaccine")
+    .leftJoinAndSelect("vaccine.citizen", "citizen")
+    .where("citizen.gender =:gender AND citizen.birthday > :eighteenAgo", {
+      gender: "M",
+      eighteenAgo: eighteenAgo(),
+    })
+    .getMany();
+  let women_adult = await Vaccine.createQueryBuilder("vaccine")
+    .leftJoinAndSelect("vaccine.citizen", "citizen")
+    .where("citizen.gender =:gender AND citizen.birthday <= :eighteenAgo", {
+      gender: "F",
+      eighteenAgo: eighteenAgo(),
+    })
+    .getMany();
+  let women_minor = await Vaccine.createQueryBuilder("vaccine")
+    .leftJoinAndSelect("vaccine.citizen", "citizen")
+    .where("citizen.gender =:gender AND citizen.birthday > :eighteenAgo", {
+      gender: "F",
+      eighteenAgo: eighteenAgo(),
+    })
+    .getMany();
+  if (!men_adult || !men_minor || !women_adult || !women_minor) {
+    return {
+      messages: "An error occurred retrieving vaccines",
+      stats: {
+        women: {
+          minors: 0,
+          adults: 0,
+        },
+        men: {
+          minors: 0,
+          adults: 0,
+        },
+      },
+    };
+  }
+  men_adult = getUniqueListBy(men_adult, "dni");
+  men_minor = getUniqueListBy(men_minor, "dni");
+  women_adult = getUniqueListBy(women_adult, "dni");
+  women_minor = getUniqueListBy(women_minor, "dni");
+
+  return {
+    stats: {
+      women: { minors: women_minor.length, adults: women_adult.length },
+      men: { minors: men_minor.length, adults: men_adult.length },
+    },
+  };
+};
+// const eighteenAgo = () => {
+//   const currentDay = new Date();
+//   currentDay.setFullYear(currentDay.getFullYear() - 18);
+//   return currentDay;
+// };
+// function getUniqueListBy(arr: Vaccine[], key: any) {
+//   return [...new Map(arr.map((item: any) => [item[key], item])).values()];
+// }
+
+// let men_adult = await Vaccine.createQueryBuilder("vaccine")
+//   .leftJoinAndSelect("vaccine.citizen", "citizen")
+//   .where("citizen.gender =:gender AND citizen.birthday <= :eighteenAgo", {
+//     gender: "M",
+//     eighteenAgo: eighteenAgo(),
+//   })
+//   .getMany();
+
+// let men_minor = await Vaccine.createQueryBuilder("vaccine")
+//   .leftJoinAndSelect("vaccine.citizen", "citizen")
+//   .where("citizen.gender =:gender AND citizen.birthday > :eighteenAgo", {
+//     gender: "M",
+//     eighteenAgo: eighteenAgo(),
+//   })
+//   .getMany();
+// let women_adult = await Vaccine.createQueryBuilder("vaccine")
+//   .leftJoinAndSelect("vaccine.citizen", "citizen")
+//   .where("citizen.gender =:gender AND citizen.birthday <= :eighteenAgo", {
+//     gender: "F",
+//     eighteenAgo: eighteenAgo(),
+//   })
+//   .getMany();
+// let women_minor = await Vaccine.createQueryBuilder("vaccine")
+//   .leftJoinAndSelect("vaccine.citizen", "citizen")
+//   .where("citizen.gender =:gender AND citizen.birthday > :eighteenAgo", {
+//     gender: "F",
+//     eighteenAgo: eighteenAgo(),
+//   })
+//   .getMany();
+// if (!men_adult || !men_minor || !women_adult || !women_minor) {
+//   return {
+//     messages: "An error occurred retrieving vaccines",
+//     stats: {
+//       women: {
+//         minors: 0,
+//         adults: 0,
+//       },
+//       men: {
+//         minors: 0,
+//         adults: 0,
+//       },
+//     },
+//   };
+// }
+// men_adult = getUniqueListBy(men_adult, "dni");
+// men_minor = getUniqueListBy(men_minor, "dni");
+// women_adult = getUniqueListBy(women_adult, "dni");
+// women_minor = getUniqueListBy(women_minor, "dni");
+
+// const eighteenAgo = () => {
+//   const currentDay = new Date();
+//   currentDay.setFullYear(currentDay.getFullYear() - 18);
+//   return currentDay;
+// };
+
+// const men_adult = await Vaccine.createQueryBuilder("vaccine")
+//   .leftJoinAndSelect("vaccine.citizen", "citizen")
+//   .where("citizen.gender =:gender AND citizen.birthday <= :eighteenAgo", {
+//     gender: "M",
+//     eighteenAgo: eighteenAgo(),
+//   })
+//   .addGroupBy("citizen")
+//   .getCount();
+// const men_minor = await Vaccine.createQueryBuilder("vaccine")
+//   .leftJoinAndSelect("vaccine.citizen", "citizen")
+//   .where("citizen.gender =:gender AND citizen.birthday > :eighteenAgo", {
+//     gender: "M",
+//     eighteenAgo: eighteenAgo(),
+//   })
+//   .addSelect("GROUP BY citizen.id")
+//   .groupBy("citizen.dni")
+//   .getCount();
+// const women_adult = await Vaccine.createQueryBuilder("vaccine")
+//   .leftJoinAndSelect("vaccine.citizen", "citizen")
+//   .where("citizen.gender =:gender AND citizen.birthday <= :eighteenAgo", {
+//     gender: "F",
+//     eighteenAgo: eighteenAgo(),
+//   })
+//   .groupBy("citizen.dni")
+//   .getCount();
+// const women_minor = await Vaccine.createQueryBuilder("vaccine")
+//   .leftJoinAndSelect("vaccine.citizen", "citizen")
+//   .where("citizen.gender =:gender AND citizen.birthday > :eighteenAgo", {
+//     gender: "F",
+//     eighteenAgo: eighteenAgo(),
+//   })
+//   .groupBy("citizen.dni")
+//   .getCount();
