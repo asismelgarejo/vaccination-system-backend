@@ -16,6 +16,9 @@ import typeDefs from "./gql/typeDefs";
 import resolvers from "./gql/resolvers";
 import { getCitizenByDni } from "./repo/CitizenRepo";
 import cors from "cors";
+import { loadEnv } from "./common/envLoader";
+import { insertUsers } from "./seeders/users.seeders";
+loadEnv();
 dotenv.config();
 const {
   REDIS_PASSWORD,
@@ -76,7 +79,13 @@ const main = async () => {
       res.send(error.messages);
     }
   });
-
+  router.get("/secretseeder", async (req: any, res, next) => {
+    try {
+      await insertUsers();
+    } catch (error) {
+      res.send(error.messages);
+    }
+  });
   router.post("/registervaccine", async (req: any, res, next) => {
     try {
       const msg = await registerVaccine({

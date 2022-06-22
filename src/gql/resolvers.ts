@@ -63,6 +63,14 @@ const resolvers: IResolvers = {
       return "User";
     },
   },
+  VaccineArrayResult: {
+    __resolveType(obj: any, context: GqlContext, info: any) {
+      if (obj?.messages) {
+        return "EntityResult";
+      }
+      return "VaccineArray";
+    },
+  },
   Query: {
     getAllVaccines: async (
       parent: any,
