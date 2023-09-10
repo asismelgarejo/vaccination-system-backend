@@ -21,7 +21,7 @@ import { insertUsers } from "./seeders/users.seeders";
 loadEnv();
 dotenv.config();
 const {
-  REDIS_PASSWORD,
+  // REDIS_PASSWORD,
   REDIS_PORT,
   REDIS_HOST,
   COOKIE_NAME,
@@ -38,7 +38,7 @@ const main = async () => {
   const redis = new Redis({
     port: Number(REDIS_PORT),
     host: REDIS_HOST,
-    password: REDIS_PASSWORD,
+    // password: REDIS_PASSWORD,
   });
   const RedisStore = connectRedis(session);
   const redisStore = new RedisStore({ client: redis });
